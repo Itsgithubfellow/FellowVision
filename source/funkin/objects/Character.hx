@@ -351,6 +351,12 @@ class Character extends Bopper
 		super.playAnim(animToPlay, isForced, isReversed, frame);
 	}
 	
+	public function playEndAnim(animName:String, isForced:Bool = false, isReversed:Bool = false, frame:Int = 0)
+	{
+		specialAnim = false;
+		playAnim(animName + '-end', isForced, isReversed, frame);
+	}
+	
 	override function onBeatHit(beat:Int)
 	{
 		if (stunned || getAnimName().startsWith('sing')) return;
