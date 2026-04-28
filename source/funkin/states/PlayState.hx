@@ -813,7 +813,7 @@ class PlayState extends MusicBeatState
 		FlxG.watch.addFunction('curStep: ', () -> curStep);
 		#end
 		
-		updateCamDisplacement(updateCamTarget());
+		moveCamera(updateCamTarget());
 		
 		noteTypeMap?.clear();
 		noteTypeMap = null;
