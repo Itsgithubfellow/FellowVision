@@ -744,13 +744,20 @@ class PlayState extends MusicBeatState
 		Conductor.songPosition = -5000;
 		
 		playFields = new FlxTypedGroup<PlayField>();
-		add(playFields);
 		
 		notes = new FlxTypedGroup<Note>();
-		add(notes);
+		
+		if (ClientPrefs.underlayType == 'Screen Dim')
+		{
+			screenDim = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
+			screenDim.alpha = ClientPrefs.underlayOpacity;
+			screenDim.scrollFactor.set();
+			screenDim.camera = camHUD;
+			add(screenDim);
+		}
 		
 		playHUD = new funkin.game.huds.PsychHUD(this);
-		insert(members.indexOf(playFields), playHUD); // Data told me to do this
+		add(playHUD);
 		playHUD.cameras = [camHUD];
 		
 		meta = SongMeta.getFromSong();
@@ -913,6 +920,10 @@ class PlayState extends MusicBeatState
 	
 	var splashLayering:Array<Dynamic> = [];
 	
+	public var screenDim:Null<FlxSprite>;
+	
+	var underlayList:Array<Underlay> = [];
+	
 	public function generatePlayfields()
 	{
 		if (generatedFields) return;
@@ -976,6 +987,12 @@ class PlayState extends MusicBeatState
 			final splashGrp = strums.splashLayer;
 			splashGrp.camera = camHUD;
 			splashLayering.push(splashGrp);
+			
+			if (ClientPrefs.underlayType == 'Lane Underlay')
+			{
+				var underlay = new Underlay(strums);
+				underlayList.push(underlay);
+			}
 			
 			if (lane == 1)
 			{
@@ -1308,7 +1325,21 @@ class PlayState extends MusicBeatState
 		scripts.set('vocals', audio);
 		scripts.set('inst', audio.inst);
 		
-		// layering for notesplash stuff
+		if (ClientPrefs.underlayType == 'Lane Underlay')
+		{
+			for (i in underlayList)
+			{
+				if (i != null)
+				{
+					i.camera = camHUD;
+					insert(members.indexOf(playHUD), i);
+				}
+			}
+		}
+		
+		add(playFields);
+		add(notes);
+		
 		for (i in splashLayering)
 			add(i);
 			
@@ -1969,6 +2000,13 @@ class PlayState extends MusicBeatState
 				cpuControlled = !cpuControlled;
 				botplayTxt.visible = !botplayTxt.visible;
 			}
+		}
+		
+		if (ClientPrefs.underlayType == 'Screen Dim' && screenDim != null)
+		{
+			screenDim.scale.set(FlxG.width * camHUD.zoom, FlxG.height * camHUD.zoom);
+			screenDim.updateHitbox();
+			screenDim.screenCenter();
 		}
 		
 		scripts.call('onUpdatePost', [elapsed]);
