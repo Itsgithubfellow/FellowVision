@@ -920,9 +920,7 @@ class PlayState extends MusicBeatState
 	
 	var splashLayering:Array<Dynamic> = [];
 	
-	public var screenDim:Null<FlxSprite>;
-	
-	var underlayList:Array<Underlay> = [];
+	public var screenDim:Null<FlxSprite>; // this doesnt need to be apart of playstate
 	
 	public function generatePlayfields()
 	{
@@ -987,12 +985,6 @@ class PlayState extends MusicBeatState
 			final splashGrp = strums.splashLayer;
 			splashGrp.camera = camHUD;
 			splashLayering.push(splashGrp);
-			
-			if (ClientPrefs.underlayType == 'Lane Underlay')
-			{
-				var underlay = new Underlay(strums);
-				underlayList.push(underlay);
-			}
 			
 			if (lane == 1)
 			{
@@ -1324,18 +1316,6 @@ class PlayState extends MusicBeatState
 		
 		scripts.set('vocals', audio);
 		scripts.set('inst', audio.inst);
-		
-		if (ClientPrefs.underlayType == 'Lane Underlay')
-		{
-			for (i in underlayList)
-			{
-				if (i != null)
-				{
-					i.camera = camHUD;
-					insert(members.indexOf(playHUD), i);
-				}
-			}
-		}
 		
 		add(playFields);
 		add(notes);
