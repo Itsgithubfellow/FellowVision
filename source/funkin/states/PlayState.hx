@@ -607,7 +607,7 @@ class PlayState extends MusicBeatState
 		
 		instance = this;
 		
-		traceCheck = #if debug true #else false #end || ClientPrefs.inDevMode;
+		traceCheck = #if debug true #else false #end || #if VERBOSE_LOGS true #else false #end || ClientPrefs.inDevMode;
 		
 		if (traceCheck) loadStart = Sys.time();
 		
@@ -1824,13 +1824,7 @@ class PlayState extends MusicBeatState
 		
 		if (generatedMusic)
 		{
-			if (!inCutscene)
-			{
-				if (!cpuControlled) keyShit();
-				else if (boyfriend.holdTimer > Conductor.stepCrotchet * 0.0011 * boyfriend.singDuration
-					&& boyfriend.getAnimName().startsWith('sing')
-					&& !boyfriend.getAnimName().endsWith('miss')) boyfriend.dance(boyfriend.forceDance);
-			}
+			if (!inCutscene) keyShit();
 			
 			var i:Int = notes.length;
 			while (--i >= 0)
@@ -1954,7 +1948,7 @@ class PlayState extends MusicBeatState
 		
 		if (ClientPrefs.underlayType == 'Screen Dim' && screenDim != null)
 		{
-			screenDim.scale.set(FlxG.width * camHUD.zoom, FlxG.height * camHUD.zoom);
+			screenDim.scale.set(screenDim.camera.width / screenDim.camera.zoom, screenDim.camera.height / screenDim.camera.zoom);
 			screenDim.updateHitbox();
 			screenDim.screenCenter();
 		}
@@ -2859,6 +2853,8 @@ class PlayState extends MusicBeatState
 	}
 	
 	// Hold notes
+	var holders:Array<Character> = [];
+	
 	function keyShit():Void
 	{
 		// HOLDING
@@ -2921,6 +2917,14 @@ class PlayState extends MusicBeatState
 				for (field in playFields)
 				{
 					if (field.playerControls && field.owner?.holding) field.owner.holding = false;
+				}
+				
+				if (holders.length > 0)
+				{
+					for (holder in holders)
+						holder.holding = false;
+						
+					holders.resize(0);
 				}
 			}
 		}
@@ -2987,8 +2991,6 @@ class PlayState extends MusicBeatState
 		super.beatHit();
 		
 		if (lastBeatHit >= curBeat) return;
-		
-		if (generatedMusic) notes.sort(FlxSort.byY, ClientPrefs.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING);
 		
 		handleBoppers(curBeat);
 		
