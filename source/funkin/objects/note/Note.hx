@@ -506,12 +506,22 @@ class Note extends FunkinSprite implements funkin.game.modchart.IModNote
 	function _loadNoteAnims()
 	{
 		final noteAnims = skin.noteAnims;
-		final directionAnims = noteAnims[noteData % noteAnims.length];
 		
-		for (anim in directionAnims)
+		var animLength = noteData % noteAnims.length;
+		// Accounts for negative note data (usually present when porting incompatible charts)
+		if (animLength < 0)
 		{
-			addAnimByPrefix(anim.anim, '${anim.xmlName}0', anim.fps, true);
-			addOffset(anim.anim, anim.offsets[0], anim.offsets[1]);
+			animLength += noteAnims.length;
+		}
+		final directionAnims = noteAnims[animLength];
+		
+		if (directionAnims != null)
+		{
+			for (anim in directionAnims)
+			{
+				addAnimByPrefix(anim.anim, '${anim.xmlName}0', anim.fps, true);
+				addOffset(anim.anim, anim.offsets[0], anim.offsets[1]);
+			}
 		}
 		
 		setGraphicSize(Std.int(width * skin.noteScale));
