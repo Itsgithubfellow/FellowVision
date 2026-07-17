@@ -269,7 +269,7 @@ class Character extends Bopper
 			return;
 		}
 		
-		if (animTimer > 0)
+		if (animTimer > 0 && !getAnimName().endsWith('-end'))
 		{
 			animTimer -= elapsed;
 			if (animTimer <= 0)
@@ -289,12 +289,24 @@ class Character extends Bopper
 			dance(forceDance);
 			finishAnim();
 		}
+		else if (getAnimName().endsWith('-end') && isAnimFinished())
+		{
+			dance(forceDance);
+		}
 		
 		if (getAnimName().startsWith('sing') || holding) holdTimer += elapsed;
 		
 		if (!holding && holdTimer >= Conductor.stepCrotchet * 0.001 * singDuration)
 		{
-			dance(forceDance);
+			if (hasAnim(getAnimName() + '-end'))
+			{
+				playAnim(getAnimName() + '-end', true);
+			}
+			else
+			{
+				dance(forceDance);
+			}
+			
 			holdTimer = 0;
 		}
 		

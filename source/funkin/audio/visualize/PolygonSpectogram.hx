@@ -26,9 +26,12 @@ class PolygonSpectogram extends MeshRender
 	
 	public var audioData:Int16Array;
 	public var detail:Float = 1;
+
+	public var scaleX:Float = 1;
+	public var scaleY:Float = 1;
 	
 	public var thickness:Float = 2;
-	public var waveAmplitude:Int = 100;
+	public var waveAmplitude:Float = 100;
 	
 	public var direction:SPECDIRECTION = VERTICAL;
 	
@@ -104,9 +107,11 @@ class PolygonSpectogram extends MeshRender
 				var sampleApprox:Int = Std.int(FlxMath.remapToRange(i, 0, funnyPixels, startSample, startSample + samplesToGen));
 				var curAud:CurAudioInfo = VisShit.getCurAud(audioData, sampleApprox);
 				
+				var windowFactor:Float = 0.5 * (1 - Math.cos((Math.PI * 2 * i) / funnyPixels));
+				
 				var coolPoint:FlxPoint = new FlxPoint();
-				var posX = (curAud.balanced * waveAmplitude);
-				var posY = (i / funnyPixels * daHeight);
+				var posX = (curAud.balanced * waveAmplitude * windowFactor) * scaleX;
+				var posY = (i / funnyPixels * daHeight * scaleY);
 				
 				if (direction == VERTICAL)
 				{

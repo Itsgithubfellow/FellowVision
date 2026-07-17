@@ -2533,7 +2533,6 @@ class PlayState extends MusicBeatState
 	
 	public function moveCamera(char:Character):Void
 	{
-		var desiredPos:Null<FlxPoint> = null;
 		var curCharacter:Null<Character> = null;
 		
 		if (char != null)
