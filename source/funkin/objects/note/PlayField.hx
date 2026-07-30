@@ -208,8 +208,12 @@ class PlayField extends FlxTypedContainer<StrumNote>
 			
 			underlaySpr.x = targetX;
 			
+			final angleRad = camera.scrollAngle * flixel.math.FlxAngle.TO_RAD;
+			final cos = Math.abs(Math.cos(angleRad));
+			final sin = Math.abs(Math.sin(angleRad));
+			
 			underlaySpr.scale.x = targetW;
-			underlaySpr.scale.y = camera.viewHeight;
+			underlaySpr.scale.y = camera.viewWidth * sin + camera.viewHeight * cos;
 			underlaySpr.screenCenter(Y);
 			underlaySpr.updateHitbox();
 			
@@ -352,7 +356,7 @@ class PlayField extends FlxTypedContainer<StrumNote>
 		if (strum != null)
 		{
 			strum.lastNote = note;
-			strum.playAnim('confirm', true);
+			if (field.playAnims) strum.playAnim('confirm', true);
 			
 			if (field.autoPlayed)
 			{
@@ -404,8 +408,8 @@ class PlayField extends FlxTypedContainer<StrumNote>
 		if (field.playerControls)
 		{
 			var ratingThing:funkin.game.Rating = funkin.game.Rating.judgeNote(note, Math.abs(note.strumTime - Conductor.songPosition + ClientPrefs.ratingOffset) / PlayState.instance?.playbackRate);
-			
-			shouldSplash = (ratingThing.name == 'sick' || ratingThing.name == 'epic');
+			note.rating = ratingThing;
+			shouldSplash = ratingThing.ratingMod >= 1;
 		}
 		
 		if (field.noteSplashes && shouldSplash) field.spawnSplash(note);
@@ -529,13 +533,14 @@ class PlayField extends FlxTypedContainer<StrumNote>
 			{
 				final ghostAnim:String = char.getAnimName();
 				
-				if (!note.isSustainNote && Math.abs(char.lastHitTime - note.strumTime) < 3 && ClientPrefs.jumpGhosts
-					&& PlayState.instance?.scripts.call('onGhostAnim', [ghostAnim, note]) != ScriptConstants.STOP_FUNC)
+				if (!note.isSustainNote && Math.abs(char.lastHitTime - note.strumTime) < 3
+					&& char.ghostsEnabled && PlayState.instance?.scripts.call('onGhostAnim', [ghostAnim, note]) != ScriptConstants.STOP_FUNC)
 				{
 					char.playGhostAnim(note.noteData, ghostAnim, true);
 				}
 				
-				char.playAnim(animToPlay, true);
+				if (note.isSustainNote && !note.isSustainEnd && char.animOffsets.exists('$animToPlay-hold')) char.playAnim('$animToPlay-hold', false);
+				else char.playAnim(animToPlay, true);
 				
 				if (!note.isSustainNote || note.prevNote?.isSustainNote) char.lastHitTime = note.strumTime;
 			}
@@ -544,7 +549,7 @@ class PlayField extends FlxTypedContainer<StrumNote>
 	
 	public function spawnSplash(note:Note):NoteSplash
 	{
-		if (ClientPrefs.noteSplashes
+		if ((ClientPrefs.noteSplashType == "Both" || ClientPrefs.noteSplashType == "Note Splashes")
 			&& note != null
 			&& !note.hitCausesMiss
 			&& !note.isSustainNote
@@ -574,7 +579,9 @@ class PlayField extends FlxTypedContainer<StrumNote>
 	
 	public function spawnSusSplash(note:Note, isPlayer:Bool = false):SustainSplash
 	{
-		if (_skin?.sustainSplashes && note.tail.length > 0)
+		if ((ClientPrefs.noteSplashType == "Both" || ClientPrefs.noteSplashType == "Hold Covers")
+			&& _skin?.sustainSplashes 
+			&& note.tail.length > 0)
 		{
 			final strum:Null<StrumNote> = note.playField.members[note.noteData];
 			if (strum != null)
