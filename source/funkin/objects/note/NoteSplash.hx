@@ -90,9 +90,9 @@ class NoteSplash extends FunkinSprite implements funkin.game.modchart.IModNote
 	{
 		if (colors == null) return;
 		
-		final sanitzedColourArray = colors ?? NoteUtil.colorToArray(skin.colors[data]);
+		final sanitzedColourArray = colors ?? NoteUtil.colorToArray(skin.splashColors[data] ?? skin.colors[data]);
 		
-		rgbGraphics.enabled = skin.inEngineColoring;
+		rgbGraphics.enabled = skin.splashInEngineColoring;
 		rgbGraphics.setColors(sanitzedColourArray);
 	}
 	

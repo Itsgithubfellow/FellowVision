@@ -447,6 +447,20 @@ class NoteUtil
 		return new RGBGraphics(colors.r, colors.g, colors.b);
 	}
 	
+	// sega does what nintendont
+	// only want this cuz i wanna have more control
+	// oveer individual elements
+	// this is never coming to base nmv so its okae...
+	public static function getSplashColors(id:Int = 0, player:Int = 0):RGBGraphics
+	{
+		final skin = getSkinFromID(player);
+		
+		final idx = id > skin.keys ? 0 : id;
+		final colors = skin.splashColors[idx] ?? skin.colors[idx];
+		
+		return new RGBGraphics(colors.r, colors.g, colors.b);
+	}
+	
 	public static function colorToArray(color:ColorList):Array<FlxColor>
 	{
 		final _color = color ?? defaultColors[0];

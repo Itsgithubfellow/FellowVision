@@ -562,7 +562,7 @@ class PlayField extends FlxTypedContainer<StrumNote>
 			{
 				final data = note.noteData;
 				final skin:String = _skin.splashTexture;
-				final colors = note.rgbGraphics;
+				final colors = NoteUtil.getSplashColors(data, player);
 				
 				var splash:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
 				splash.setupNoteSplash(strum, note, skin, colors, this);
@@ -587,7 +587,7 @@ class PlayField extends FlxTypedContainer<StrumNote>
 			if (strum != null)
 			{
 				final data = note.noteData;
-				final colors = note.rgbGraphics;
+				final colors = NoteUtil.getSplashColors(data, player);
 				
 				// sustain length + step length (all in ms) to time the ending of the sustain covering
 				final time = ((note.sustainLength + (Conductor.stepCrotchet * 1.25)) / 1000);
@@ -664,13 +664,13 @@ class PlayField extends FlxTypedContainer<StrumNote>
 			splash.scale.set(_skin.splashScale, _skin.splashScale);
 			splash.baseScale.copyFrom(splash.scale);
 			
-			splash.rgbGraphics.enabled = _skin.inEngineColoring;
+			splash.rgbGraphics.enabled = _skin.splashInEngineColoring;
 		});
 		grpSusSplashes.forEachAlive((splash) -> {
 			splash.scale.set(_skin.susSplashScale, _skin.susSplashScale);
 			splash.baseScale.copyFrom(splash.scale);
 			
-			splash.rgbGraphics.enabled = _skin.inEngineColoring;
+			splash.rgbGraphics.enabled = _skin.splashInEngineColoring;
 		});
 	}
 	

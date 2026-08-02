@@ -67,9 +67,9 @@ class SustainSplash extends FunkinSprite implements funkin.game.modchart.IModNot
 	{
 		if (colors == null || skin == null) return;
 		
-		final sanitzedColourArray = colors ?? NoteUtil.colorToArray(skin.colors[data]);
+		final sanitzedColourArray = colors ?? NoteUtil.colorToArray(skin.splashColors[data] ?? skin.colors[data]);
 		
-		rgbGraphics.enabled = skin.inEngineColoring;
+		rgbGraphics.enabled = skin.splashInEngineColoring;
 		rgbGraphics.setColors(sanitzedColourArray);
 	}
 	
@@ -90,10 +90,12 @@ class SustainSplash extends FunkinSprite implements funkin.game.modchart.IModNot
 		
 		antialiasing = skin.antialiasing;
 		
+		// isQuant = ClientPrefs.quants && (skin?.quantsEnabled ?? true) && canQuant;
+		
 		if (skin?.susSplashScale != null) scale.set(skin.susSplashScale, skin.susSplashScale);
 		
 		baseScale.copyFrom(scale);
-
+		
 		addAnims(skin);
 		
 		updateHitbox();
