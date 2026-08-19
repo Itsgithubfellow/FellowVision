@@ -18,8 +18,8 @@
             },
             {
                 "name": "flixel-animate",
-                "link": "https://github.com/MaybeMaru/flixel-animate",
-                "branch": "4fb307acac9379966dfa0b7619b37036fcd39b32"
+                "link": "https://github.com/FunkinCrew/flixel-animate",
+                "branch": "baaced6c229810354e9573737efccc1c01eaea77"
             },
             {
                 "name": "hscript",
