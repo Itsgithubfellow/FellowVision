@@ -123,7 +123,7 @@ class SustainSplash extends FunkinSprite implements funkin.game.modchart.IModNot
 	
 	function watchTail()
 	{
-		if (__tail == null)
+		if (__tail == null || (__tail != null && __tail.garbage))
 		{
 			kill(); // die dont even splash jsut die
 			return;
