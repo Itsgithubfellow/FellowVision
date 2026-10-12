@@ -345,6 +345,7 @@ class Mods
 		if (pack == null) return;
 		
 		currentModConfig = pack;
+		funkin.data.ModOptions.init(currentModDirectory);
 		
 		WindowUtil.setTitle(pack.windowTitle ?? WindowUtil.defaultAppTitle);
 		
@@ -391,7 +392,7 @@ class Mods
 		
 		Paths.DEFAULT_FONT = pack.defaultFont != null && FunkinAssets.exists(Paths.font(pack.defaultFont)) ? Paths.font(pack.defaultFont) : Paths.font('vcr.ttf');
 		
-		inline function dirExists(dir:String):Bool return dir != null && FunkinAssets.isDirectory('content/${Mods.currentModDirectory}/images/$dir');
+		inline function dirExists(dir:String):Bool return dir != null && FunkinAssets.isDirectory('${Paths.MODS_DIRECTORY}/${Mods.currentModDirectory}/images/$dir');
 		
 		Paths.UI_PREFIX = dirExists(pack.uiPrefix) ? pack.uiPrefix : 'UI/';
 		Paths.COMBO_PREFIX = dirExists(pack.comboPrefix) ? pack.comboPrefix : 'UI/combo/';

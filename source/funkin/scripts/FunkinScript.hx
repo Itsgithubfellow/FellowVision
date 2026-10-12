@@ -56,21 +56,30 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 	 */
 	public static function init()
 	{
-		inline function formatFileLoc(fileName:String, lineNumber:Int, x:String)
+		#if FLX_DEBUG
+		FlxG.console.registerClass(Iris);
+		FlxG.console.registerClass(IrisEx);
+		FlxG.console.registerClass(FunkinScript);
+		#end
+		
+		// took this from imposter legacy thanks ashley
+		inline function formatFileLoc(fileName:String = 'hscript', lineNumber:Int = 0, x:String = '', prefix:String = '')
 		{
-			var tempName = '[$fileName:$lineNumber]';
+			var prefix = '[$prefix$fileName:$lineNumber]';
 			
-			if (fileName.contains(Mods.currentModDirectory)) tempName = tempName.replace('content/${Mods.currentModDirectory}/', '');
+			final modPath:String = Paths.mods(Mods.currentModDirectory + '/');
+			if (fileName.startsWith(modPath)) prefix = prefix.replace(modPath, '');
+			#if ASSET_REDIRECT
+			else if (fileName.startsWith(Paths.trail)) prefix = prefix.replace(Paths.trail, '');
+			#end
 			
-			tempName += ' - $x';
-			
-			return tempName;
+			return '$prefix - $x';
 		}
 		
 		Iris.warn = (x, ?pos) -> {
 			final output:String = formatFileLoc(pos.fileName, pos.lineNumber, x);
 			
-			DebugTextPlugin.addText(Std.string(output), Logger.getHexColourFromSeverity(WARN));
+			DebugTextPlugin.instance.addText(Std.string(output), Logger.getHexColourFromSeverity(WARN));
 			
 			Iris.logLevel(ERROR, x, pos);
 		}
@@ -78,7 +87,7 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		Iris.error = (x, ?pos) -> {
 			final output:String = formatFileLoc(pos.fileName, pos.lineNumber, x);
 			
-			DebugTextPlugin.addText(Std.string(output), Logger.getHexColourFromSeverity(ERROR));
+			DebugTextPlugin.instance.addText(Std.string(output), Logger.getHexColourFromSeverity(ERROR));
 			
 			Iris.logLevel(NONE, x, pos);
 		}
@@ -86,7 +95,7 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		Iris.print = (x, ?pos) -> {
 			final output:String = formatFileLoc(pos.fileName, pos.lineNumber, x);
 			
-			DebugTextPlugin.addText(Std.string(output), Logger.getHexColourFromSeverity(PRINT));
+			DebugTextPlugin.instance.addText(Std.string(output), Logger.getHexColourFromSeverity(PRINT));
 			
 			Iris.logLevel(NONE, x, pos);
 		}
@@ -97,9 +106,9 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 	 * @param scriptContent The raw content of a script in a string.
 	 * @param name The name of the script.
 	 */
-	public static function fromString(scriptContent:String, name:String = "Script", autoExecute:Bool = true, ?shareables:Sharables)
+	public static function fromString(script:String, ?name:String = "Script", autoExecute:Bool = true, ?shareables:Sharables, ?modFolder:String)
 	{
-		return new FunkinScript(scriptContent, name, autoExecute, shareables);
+		return new FunkinScript(script, name, autoExecute, shareables, modFolder);
 	}
 	
 	/**
@@ -110,11 +119,13 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 	 * @param file The path to the file
 	 * @param name The name of the script. if null, `file` is used.
 	 */
-	public static function fromFile(file:String, ?name:String, autoExecute:Bool = true, ?shareables:Sharables)
+	public static function fromFile(file:String, ?name:String, autoExecute:Bool = true, ?shareables:Sharables, ?modFolder:String)
 	{
 		name ??= file;
 		
-		return new FunkinScript(FunkinAssets.getContent(file), name, autoExecute, shareables);
+		modFolder ??= Paths.getModFolder(file, 'scripts');
+		
+		return new FunkinScript(FunkinAssets.getContent(file), name, autoExecute, shareables, modFolder);
 	}
 	
 	/**
@@ -132,11 +143,15 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		return parsingException != null;
 	}
 	
-	public function new(content:String, name:String = "Script", autoExecute:Bool = true, ?shareables:Sharables)
+	public var modFolder:Null<String>;
+	
+	public function new(script:String, ?name:String = "Script", autoExecute:Bool = true, ?shareables:Sharables, ?modFolder:String)
 	{
-		super(content, {name: name, autoRun: false, autoPreset: false}, shareables);
+		super(script, {name: name, autoRun: false, autoPreset: false}, shareables);
 		
 		(cast interp : InterpEx).parent = FlxG.state;
+		
+		this.modFolder = modFolder;
 		
 		preset();
 		
@@ -222,6 +237,7 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		set("Type", Type);
 		set("script", this);
 		set("Dynamic", Dynamic);
+		set('modFolder', modFolder);
 		
 		set('StringMap', haxe.ds.StringMap);
 		set('IntMap', haxe.ds.IntMap);
@@ -237,11 +253,6 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		set('Function_Halt', funkin.scripting.ScriptConstants.HALT_FUNC);
 		set('Function_Stop', funkin.scripting.ScriptConstants.STOP_FUNC);
 		set('Function_Continue', funkin.scripting.ScriptConstants.CONTINUE_FUNC);
-		set('curBeat', 0);
-		set('curStep', 0);
-		set('curSection', 0);
-		set('curDecBeat', 0);
-		set('curDecStep', 0);
 		set('version', Main.NMV_VERSION.trim());
 		set('asset_redirect', #if ASSET_REDIRECT true #else false #end);
 		set('Defines', funkin.data.Defines);
@@ -249,7 +260,7 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		// set flixel related stuff
 		set("FlxG", flixel.FlxG);
 		set("FlxSprite", flixel.FlxSprite);
-		set("FlxCamera", extensions.flixel.FlxCameraEx);
+		set("FlxCamera", funkin.backend.FunkinCamera);
 		set("FlxMath", flixel.math.FlxMath);
 		set("FlxTimer", flixel.util.FlxTimer);
 		set("FlxTween", flixel.tweens.FlxTween);
@@ -405,5 +416,10 @@ class FunkinScript extends IrisEx implements IFlxDestroyable
 		}
 		
 		set("newShader", FunkinRuntimeShader.fromPath);
+		
+		set("newOption", (key:String, type:String, defaultValue:Dynamic, ?settings:funkin.data.ModOptions.OptionSettings) -> {
+			funkin.data.ModOptions.add(this.modFolder, key, type, defaultValue, settings);
+		});
+		set("getOption", funkin.data.ModOptions.getValue);
 	}
 }
