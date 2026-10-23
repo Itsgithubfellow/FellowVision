@@ -133,6 +133,12 @@ class FunkinCamera extends extensions.flixel.FlxCameraEx
 		// the specified blend mode requires the shader.
 		if (shouldUseShader)
 		{
+			if (_cameraTexture.width != this.width || _cameraTexture.height != this.height)
+			{
+				_cameraTexture.dispose();
+				_cameraTexture = FixedBitmapData.create(this.width, this.height);
+			}
+			
 			if (crossCameraBlending)
 			{
 				var camerasUnderneath:Array<FlxCamera> = FlxG.cameras.list.copy();
