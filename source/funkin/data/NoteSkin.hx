@@ -60,10 +60,6 @@ class NoteSkin implements IFlxDestroyable
 	public var inEngineColoring:Bool = true;
 	public var colors:Array<ColorList> = [];
 	
-	// for my own diddy purposes muehehe...
-	public var splashInEngineColoring:Bool = true;
-	public var splashColors:Array<ColorList> = [];
-	
 	// sing anims
 	public var singAnimations = ['singLEFT', 'singDOWN', 'singUP', 'singRIGHT'];
 	
@@ -111,12 +107,8 @@ class NoteSkin implements IFlxDestroyable
 		splashScale = data.splashScale;
 		susSplashScale = data.susSplashScale;
 		
-		quantsEnabled = data.quantsEnabled;
 		inEngineColoring = data.inGameColoring;
 		colors = data.arrowRGB;
-		
-		splashInEngineColoring = data.splashInGameColoring;
-		splashColors = data.splashRGB;
 	}
 	
 	public function destroy()
@@ -183,9 +175,6 @@ class NoteSkin implements IFlxDestroyable
 		
 		data.arrowRGB ??= NoteUtil.defaultColors.copy();
 		data.inGameColoring ??= true;
-		
-		data.splashInGameColoring ??= data.inGameColoring;
-		data.splashRGB ??= data.arrowRGB;
 	}
 }
 
@@ -216,11 +205,8 @@ typedef NoteSkinData =
 	?splashScale:Float,
 	?susSplashScale:Float,
 	
-	?quantsEnabled:Bool,
 	?inGameColoring:Bool,
-	?arrowRGB:Array<ColorList>,
-	?splashInGameColoring:Bool,
-	?splashRGB:Array<ColorList>
+	?arrowRGB:Array<ColorList>
 }
 
 typedef Animation =

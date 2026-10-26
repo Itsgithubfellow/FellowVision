@@ -66,9 +66,9 @@ class SustainSplash extends funkin.game.modchart.ModchartNote
 	{
 		if (colors == null || skin == null) return;
 		
-		final sanitzedColourArray = colors ?? NoteUtil.colorToArray(skin.splashColors[data] ?? skin.colors[data]);
+		final sanitzedColourArray = colors ?? NoteUtil.colorToArray(skin.colors[data]);
 		
-		rgbGraphics.enabled = skin.splashInEngineColoring;
+		rgbGraphics.enabled = skin.inEngineColoring;
 		rgbGraphics.setColors(sanitzedColourArray);
 	}
 	
@@ -88,8 +88,6 @@ class SustainSplash extends funkin.game.modchart.ModchartNote
 		skin = NoteUtil.getSkinFromID(player);
 		
 		antialiasing = skin.antialiasing;
-		
-		// isQuant = ClientPrefs.quants && (skin?.quantsEnabled ?? true) && canQuant;
 		
 		if (skin?.susSplashScale != null) scale.set(skin.susSplashScale, skin.susSplashScale);
 		

@@ -88,9 +88,9 @@ class NoteSplash extends funkin.game.modchart.ModchartNote
 	{
 		if (colors == null) return;
 		
-		final sanitzedColourArray = colors ?? NoteUtil.colorToArray(skin.splashColors[data] ?? skin.colors[data]);
+		final sanitzedColourArray = colors ?? NoteUtil.colorToArray(skin.colors[data]);
 		
-		rgbGraphics.enabled = skin.splashInEngineColoring;
+		rgbGraphics.enabled = skin.inEngineColoring;
 		rgbGraphics.setColors(sanitzedColourArray);
 	}
 	

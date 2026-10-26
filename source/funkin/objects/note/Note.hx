@@ -518,22 +518,12 @@ class Note extends funkin.game.modchart.ModchartNote
 	function _loadNoteAnims()
 	{
 		final noteAnims = skin.noteAnims;
+		final directionAnims = noteAnims[noteData % noteAnims.length];
 		
-		var animLength = noteData % noteAnims.length;
-		// Accounts for negative note data (usually present when porting incompatible charts)
-		if (animLength < 0)
+		for (anim in directionAnims)
 		{
-			animLength += noteAnims.length;
-		}
-		final directionAnims = noteAnims[animLength];
-		
-		if (directionAnims != null)
-		{
-			for (anim in directionAnims)
-			{
-				addAnimByPrefix(anim.anim, '${anim.xmlName}0', anim.fps, true);
-				addOffset(anim.anim, anim.offsets[0], anim.offsets[1]);
-			}
+			addAnimByPrefix(anim.anim, '${anim.xmlName}0', anim.fps, true);
+			addOffset(anim.anim, anim.offsets[0], anim.offsets[1]);
 		}
 		
 		setGraphicSize(Std.int(width * skin.noteScale * scaleMod));

@@ -421,8 +421,8 @@ class PlayField extends FlxTypedContainer<StrumNote>
 			var ratingThing:funkin.game.Rating = funkin.game.Rating.judgeNote(note, Math.abs(note.strumTime - Conductor.songPosition + ClientPrefs.ratingOffset) / PlayState.instance?.playbackRate);
 			note.rating = ratingThing;
 			shouldSplash = field.noteSplashes && ratingThing.ratingMod >= 1;
-		}
-		if (shouldSplash) field.spawnSplash(note);
+		} 
+		if(shouldSplash) field.spawnSplash(note);
 		
 		spawnSusSplash(note, field.playerControls);
 		
@@ -468,8 +468,7 @@ class PlayField extends FlxTypedContainer<StrumNote>
 		if (!note.hitCausesMiss && !note.canMiss)
 		{
 			final tail = (note.isSustainNote ? note.parent.tail : note.tail);
-			for (sustain in tail)
-				sustain.tooLate = true;
+			for (sustain in tail) sustain.tooLate = true;
 		}
 		
 		// if the sustain splash exists, KILL KIL KILL IT KILL KI L KLLK LSKD:LKLK
@@ -568,7 +567,7 @@ class PlayField extends FlxTypedContainer<StrumNote>
 			{
 				final data = note.noteData;
 				final skin:String = _skin.splashTexture;
-				final colors = NoteUtil.getSplashColors(data, player, note.quant);
+				final colors = note.rgbGraphics;
 				
 				var splash:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
 				splash.setupNoteSplash(strum, note, skin, colors, this);
@@ -586,14 +585,14 @@ class PlayField extends FlxTypedContainer<StrumNote>
 	public function spawnSusSplash(note:Note, isPlayer:Bool = false):SustainSplash
 	{
 		if ((ClientPrefs.noteSplashType == "Both" || ClientPrefs.noteSplashType == "Hold Covers")
-			&& _skin?.sustainSplashes
+			&& _skin?.sustainSplashes 
 			&& note.tail.length > 0)
 		{
 			final strum:Null<StrumNote> = note.playField.members[note.noteData];
 			if (strum != null)
 			{
 				final data = note.noteData;
-				final colors = NoteUtil.getSplashColors(data, player, note.quant);
+				final colors = note.rgbGraphics;
 				
 				// sustain length + step length (all in ms) to time the ending of the sustain covering
 				final time = ((note.sustainLength + (Conductor.stepCrotchet * 1.25)) / 1000);
@@ -670,13 +669,13 @@ class PlayField extends FlxTypedContainer<StrumNote>
 			splash.scale.set(_skin.splashScale, _skin.splashScale);
 			splash.baseScale.copyFrom(splash.scale);
 			
-			splash.rgbGraphics.enabled = _skin.splashInEngineColoring;
+			splash.rgbGraphics.enabled = _skin.inEngineColoring;
 		});
 		grpSusSplashes.forEachAlive((splash) -> {
 			splash.scale.set(_skin.susSplashScale, _skin.susSplashScale);
 			splash.baseScale.copyFrom(splash.scale);
 			
-			splash.rgbGraphics.enabled = _skin.splashInEngineColoring;
+			splash.rgbGraphics.enabled = _skin.inEngineColoring;
 		});
 	}
 	
