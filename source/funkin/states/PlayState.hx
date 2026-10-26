@@ -2491,7 +2491,7 @@ class PlayState extends MusicBeatState
 		
 		final desiredPos = char.getMidpoint();
 		
-		final offsets = char.isPlayer ? boyfriendCameraOffset : opponentCameraOffset;
+		final offsets = char.isPlayer ? boyfriendCameraOffset : (char == gf ? girlfriendCameraOffset : opponentCameraOffset);
 		
 		desiredPos.y += -100 + char.cameraPosition[1] + offsets[1];
 		
